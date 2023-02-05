@@ -1,5 +1,6 @@
 package com.kalugin1912.todoit.view.newtask
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -11,11 +12,30 @@ import com.kalugin1912.todoit.collectWhenUIVisible
 import com.kalugin1912.todoit.databinding.FragmentNewTaskBinding
 import com.kalugin1912.todoit.di.ServiceLocator.newTaskViewModelFactory
 import com.kalugin1912.todoit.view.Priority
+import com.kalugin1912.todoit.view.Task
 
 class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
 
     companion object {
-        fun newInstance() = NewTaskFragment()
+
+        private const val TASK_KEY = "task_key"
+
+        private val Bundle.task: Task?
+            get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelable(TASK_KEY, Task::class.java)
+            } else {
+                getParcelable(TASK_KEY)
+            }
+
+        private fun Bundle.putTask(task: Task) = putParcelable(TASK_KEY, task)
+
+        fun newInstance(task: Task? = null) = NewTaskFragment().apply {
+            arguments = Bundle().apply {
+                if (task != null) {
+                    putTask(task)
+                }
+            }
+        }
     }
 
     private val newTaskViewModel by viewModels<NewTaskViewModel>(
@@ -25,7 +45,9 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
     private lateinit var binding: FragmentNewTaskBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding = FragmentNewTaskBinding.bind(view)
+
         val priorityAdapter = PriorityAdapter(
             priorities = listOf(
                 Priority.LOW,
@@ -34,6 +56,13 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
             ),
             onPriorityClicked = newTaskViewModel::changePriority
         )
+
+        val task = arguments?.task
+        if (task != null) {
+            newTaskViewModel.setTaskId(task.id)
+            fillFields(task)
+        }
+
         binding.include.colorPicker.apply {
             addItemDecoration(
                 HorizontalMarginItemDecoration(
@@ -45,6 +74,10 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
             adapter = priorityAdapter
         }
         setOnBackPressedListeners()
+
+        binding.include.status.setOnClickListener {
+            newTaskViewModel.onStatusClicked()
+        }
 
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             if (menuItem.itemId == R.id.add_task) {
@@ -64,6 +97,16 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
         }
 
         newTaskViewModel.apply {
+            isCompleted.collectWhenUIVisible(viewLifecycleOwner) { isCompleted ->
+                binding.include.status.isSelected = isCompleted
+                val statusRes = if (isCompleted) R.string.status_completed else R.string.status_in_progress
+                binding.include.status.setText(statusRes)
+            }
+            isUpdate.collectWhenUIVisible(viewLifecycleOwner) { isUpdate ->
+                binding.title.setText(
+                    if (isUpdate) R.string.new_task_screen_update_title else R.string.new_task_screen_title
+                )
+            }
             selectedPriority.collectWhenUIVisible(viewLifecycleOwner) { priority ->
                 priorityAdapter.select(priority)
             }
@@ -77,7 +120,16 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
                 }
             }
         }
+    }
 
+    private fun fillFields(task: Task) {
+        binding.include.addTaskTitleEditText.setText(task.name)
+        binding.include.addTaskDescriptionEditText.setText(task.description)
+
+        newTaskViewModel.changeTitle(task.name)
+        newTaskViewModel.changeDescription(task.description)
+        newTaskViewModel.changePriority(task.priority)
+        newTaskViewModel.changeCompletion(task.isCompleted)
     }
 
     private fun setOnBackPressedListeners() {

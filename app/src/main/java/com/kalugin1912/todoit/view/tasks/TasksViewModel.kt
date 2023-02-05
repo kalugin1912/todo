@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class TasksViewModel(tasksRepository: TasksRepository) : ViewModel() {
+class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel() {
 
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
@@ -25,8 +25,17 @@ class TasksViewModel(tasksRepository: TasksRepository) : ViewModel() {
         _navigationEvent.emit(NavigationEvent.Close)
     }
 
+    fun onTaskClicked(task: Task) = viewModelScope.launch {
+        _navigationEvent.emit(NavigationEvent.UpdateTask(task))
+    }
+
+    fun onTaskStatusChanged(task: Task, isCompleted: Boolean) = viewModelScope.launch {
+        tasksRepository.updateTask(task.copy(isCompleted = isCompleted))
+    }
+
     sealed interface NavigationEvent {
         object Close : NavigationEvent
         object NewTask : NavigationEvent
+        class UpdateTask(val task: Task) : NavigationEvent
     }
 }

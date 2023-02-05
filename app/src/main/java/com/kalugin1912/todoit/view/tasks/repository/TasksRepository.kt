@@ -8,4 +8,5 @@ interface TasksRepository {
 
     suspend fun addTask(task: Task)
 
+    suspend fun updateTask(task: Task)
 }

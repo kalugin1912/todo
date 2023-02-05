@@ -15,9 +15,9 @@
         android:layout_gravity="center"
         android:drawablePadding="4dp"
         android:gravity="center"
-        android:text="New Task"
+        android:text="@string/new_task_button"
         android:textColor="@color/teal_700"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:drawableEndCompat="@drawable/baseline_add_24"
         />
 

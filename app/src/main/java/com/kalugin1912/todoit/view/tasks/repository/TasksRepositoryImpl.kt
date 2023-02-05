@@ -58,4 +58,17 @@ class TasksRepositoryImpl : TasksRepository {
         }
     }
 
+    override suspend fun updateTask(task: Task) {
+        flow.update {
+            val list = it.toMutableList()
+            list.map {
+                if (it.id == task.id) {
+                    task
+                } else {
+                    it
+                }
+            }
+        }
+    }
+
 }

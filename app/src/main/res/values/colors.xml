@@ -9,6 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="high_priority">#ff8a65</color>
-    <color name="medium_priority">#fff176</color>
+    <color name="medium_priority">#fdd835</color>
     <color name="low_priority">#81c784</color>
 </resources>
