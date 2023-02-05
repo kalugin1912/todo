@@ -18,18 +18,20 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            app:navigationIcon="@drawable/baseline_arrow_back_24"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp"
+            app:contentInsetEnd="56dp"
             >
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/tasks_screen_title"
+                android:text="@string/new_task_screen_title"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
                 android:textSize="20sp"
@@ -42,7 +44,7 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/fragment_tasks_content"
+        layout="@layout/fragment_new_task_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"

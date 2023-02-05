@@ -16,8 +16,7 @@
         android:drawablePadding="4dp"
         android:gravity="center"
         android:text="New Task"
-        android:textAllCaps="true"
-        android:textColor="#b39ddb"
+        android:textColor="@color/teal_700"
         android:textSize="16sp"
         app:drawableEndCompat="@drawable/baseline_add_24"
         />

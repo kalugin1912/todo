@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">ToDoIt</string>
+
+    <string name="tasks_screen_title">Tasks</string>
+    <string name="new_task_screen_title">New Task</string>
+
+    <string-array name="priorities">
+        <item>High Priority</item>
+        <item>Medium Priority</item>
+        <item>Low Priority</item>
+    </string-array>
 </resources>

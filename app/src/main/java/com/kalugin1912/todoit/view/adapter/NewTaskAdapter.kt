@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.kalugin1912.todoit.databinding.ItemNewTaskBinding
 
-class NewTaskAdapter: RecyclerView.Adapter<NewTaskViewHolder>() {
+class NewTaskAdapter(private val onAddTask: () -> Unit) : RecyclerView.Adapter<NewTaskViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewTaskViewHolder {
         val binding = ItemNewTaskBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NewTaskViewHolder(binding)
@@ -13,7 +13,11 @@ class NewTaskAdapter: RecyclerView.Adapter<NewTaskViewHolder>() {
 
     override fun getItemCount(): Int = 1
 
-    override fun onBindViewHolder(holder: NewTaskViewHolder, position: Int) = Unit
+    override fun onBindViewHolder(holder: NewTaskViewHolder, position: Int) {
+        holder.itemView.setOnClickListener {
+            onAddTask()
+        }
+    }
 }
 
-class NewTaskViewHolder(newTaskBinding: ItemNewTaskBinding): RecyclerView.ViewHolder(newTaskBinding.root)
+class NewTaskViewHolder(newTaskBinding: ItemNewTaskBinding) : RecyclerView.ViewHolder(newTaskBinding.root)
