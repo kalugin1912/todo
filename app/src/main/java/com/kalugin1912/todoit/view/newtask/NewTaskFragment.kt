@@ -106,6 +106,8 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
                 binding.title.setText(
                     if (isUpdate) R.string.new_task_screen_update_title else R.string.new_task_screen_title
                 )
+                val deleteMenuItem = binding.toolbar.menu.findItem(R.id.delete_task)
+                deleteMenuItem.isVisible = isUpdate
             }
             selectedPriority.collectWhenUIVisible(viewLifecycleOwner) { priority ->
                 priorityAdapter.select(priority)

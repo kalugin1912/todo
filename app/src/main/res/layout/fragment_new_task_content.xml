@@ -74,7 +74,8 @@
         />
 
     <TextView
-        android:padding="4dp"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="8dp"
         android:background="@drawable/item_status"
         android:id="@+id/status"
         android:gravity="center"

@@ -17,15 +17,15 @@
         >
 
         <androidx.appcompat.widget.Toolbar
-            app:menu="@menu/new_task_menu"
             android:id="@+id/toolbar"
-            app:navigationIcon="@drawable/ic_back"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentInsetStart="0dp"
-            app:contentInsetStartWithNavigation="0dp"
             app:contentInsetEnd="56dp"
-            app:contentInsetEndWithActions="0dp"
+            app:contentInsetEndWithActions="96dp"
+            app:contentInsetStart="96dp"
+            app:contentInsetStartWithNavigation="64dp"
+            app:menu="@menu/new_task_menu"
+            app:navigationIcon="@drawable/ic_back"
             >
 
             <TextView

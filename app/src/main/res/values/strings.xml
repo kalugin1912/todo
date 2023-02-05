@@ -5,6 +5,7 @@
     <string name="new_task_screen_title">New Task</string>
     <string name="new_task_screen_update_title">Update Task</string>
     <string name="new_task_screen_add">Add</string>
+    <string name="new_task_screen_delete">Delete</string>
     <string name="new_task_button">New Task</string>
     <string name="status_in_progress">In Progress</string>
     <string name="status_completed">Completed</string>
