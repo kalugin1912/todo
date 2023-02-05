@@ -46,6 +46,14 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
         }
         setOnBackPressedListeners()
 
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.add_task) {
+                newTaskViewModel.save()
+                true
+            } else {
+                false
+            }
+        }
         binding.include.addTaskTitleEditText.addTextChangedListener { editable ->
             val title = editable?.toString().orEmpty()
             newTaskViewModel.changeTitle(title)
@@ -54,22 +62,31 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
             val description = editable?.toString().orEmpty()
             newTaskViewModel.changeDescription(description)
         }
-        newTaskViewModel.selectedPriority.collectWhenUIVisible(viewLifecycleOwner) { priority ->
-            priorityAdapter.select(priority)
+
+        newTaskViewModel.apply {
+            selectedPriority.collectWhenUIVisible(viewLifecycleOwner) { priority ->
+                priorityAdapter.select(priority)
+            }
+            enableAddButton.collectWhenUIVisible(viewLifecycleOwner) { needShow ->
+                val newTaskMenu = binding.toolbar.menu.findItem(R.id.add_task)
+                newTaskMenu.isEnabled = needShow
+            }
+            navigationEvent.collectWhenUIVisible(viewLifecycleOwner) { event ->
+                when (event) {
+                    NavigationEvent.Close -> parentFragmentManager.popBackStack()
+                }
+            }
         }
-        newTaskViewModel.enableAddButton.collectWhenUIVisible(viewLifecycleOwner) { needShow ->
-            val newTaskMenu = binding.toolbar.menu.findItem(R.id.add_task)
-            newTaskMenu.isEnabled = needShow
-        }
+
     }
 
     private fun setOnBackPressedListeners() {
         binding.toolbar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            newTaskViewModel.close()
         }
         requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner) {
             if (isEnabled) {
-                parentFragmentManager.popBackStack()
+                newTaskViewModel.close()
             }
         }
     }

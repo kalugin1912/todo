@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.kalugin1912.todoit.R
+import com.kalugin1912.todoit.collectWhenUIVisible
 import com.kalugin1912.todoit.databinding.FragmentTasksBinding
 import com.kalugin1912.todoit.di.ServiceLocator
 import com.kalugin1912.todoit.view.Priority
@@ -34,26 +35,19 @@ class TasksFragment : Fragment(R.layout.fragment_tasks) {
         factoryProducer = { ServiceLocator.tasksViewModelFactory }
     )
 
-    private fun openNewTaskScreen() {
-        parentFragmentManager.commit {
-            replace(R.id.main_container, NewTaskFragment.newInstance())
-                .addToBackStack(null)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val binding = FragmentTasksBinding.bind(view)
         val taskAdapter = TaskAdapter()
         val concatAdapter = ConcatAdapter(
             taskAdapter,
             NewTaskAdapter {
-                openNewTaskScreen()
+                tasksViewModel.onAddNewTask()
             }
         )
 
         requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner) {
             if (isEnabled) {
-                requireActivity().finish()
+                tasksViewModel.onCloseClicked()
             }
         }
 
@@ -64,29 +58,54 @@ class TasksFragment : Fragment(R.layout.fragment_tasks) {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
 
-        binding.appbarlayout.statusBarForeground = MaterialShapeDrawable.createWithElevationOverlay(requireContext())
-
-        tasksViewModel.tasks.map { tasks ->
-            tasks.mapNotNull { task ->
-                val drawable = ContextCompat.getDrawable(
-                    requireContext(),
-                    when (task.priority) {
-                        Priority.HIGH -> R.drawable.high_priority_circle_bg
-                        Priority.MEDIUM -> R.drawable.medium_priority_circle_bg
-                        Priority.LOW -> R.drawable.low_priority_circle_bg
-                    }
-                )
-                if (drawable == null) null else TaskItem(
-                    id = task.id,
-                    name = task.name,
-                    description = task.description,
-                    statusDrawable = drawable,
-                )
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.add_task) {
+                tasksViewModel.onAddNewTask()
+                true
+            } else {
+                false
             }
         }
-            .onEach { items ->
-                taskAdapter.submitList(items)
+
+        tasksViewModel.apply {
+            tasks
+                .map { tasks ->
+                    tasks.mapNotNull { task ->
+                        val drawable = ContextCompat.getDrawable(
+                            requireContext(),
+                            when (task.priority) {
+                                Priority.HIGH -> R.drawable.high_priority_circle_bg
+                                Priority.MEDIUM -> R.drawable.medium_priority_circle_bg
+                                Priority.LOW -> R.drawable.low_priority_circle_bg
+                            }
+                        )
+                        if (drawable == null) null else TaskItem(
+                            id = task.id,
+                            name = task.name,
+                            description = task.description,
+                            statusDrawable = drawable,
+                        )
+                    }
+                }
+                .collectWhenUIVisible(viewLifecycleOwner) { items ->
+                    taskAdapter.submitList(items)
+                }
+
+            navigationEvent.collectWhenUIVisible(viewLifecycleOwner) { event ->
+                when (event) {
+                    TasksViewModel.NavigationEvent.NewTask -> openNewTaskScreen()
+                    TasksViewModel.NavigationEvent.Close -> requireActivity().finish()
+                }
             }
-            .launchIn(lifecycleScope)
+        }
+
     }
+
+    private fun openNewTaskScreen() {
+        parentFragmentManager.commit {
+            replace(R.id.main_container, NewTaskFragment.newInstance())
+                .addToBackStack(null)
+        }
+    }
+
 }
