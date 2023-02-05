@@ -3,6 +3,7 @@ package com.kalugin1912.todoit.view.newtask
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.kalugin1912.todoit.R
@@ -31,9 +32,7 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
                 Priority.MEDIUM,
                 Priority.HIGH,
             ),
-            onPriorityClicked = { priority: Priority ->
-                newTaskViewModel.changePriority(priority)
-            }
+            onPriorityClicked = newTaskViewModel::changePriority
         )
         binding.include.colorPicker.apply {
             addItemDecoration(
@@ -47,8 +46,20 @@ class NewTaskFragment : Fragment(R.layout.fragment_new_task) {
         }
         setOnBackPressedListeners()
 
+        binding.include.addTaskTitleEditText.addTextChangedListener { editable ->
+            val title = editable?.toString().orEmpty()
+            newTaskViewModel.changeTitle(title)
+        }
+        binding.include.addTaskDescriptionEditText.addTextChangedListener { editable ->
+            val description = editable?.toString().orEmpty()
+            newTaskViewModel.changeDescription(description)
+        }
         newTaskViewModel.selectedPriority.collectWhenUIVisible(viewLifecycleOwner) { priority ->
             priorityAdapter.select(priority)
+        }
+        newTaskViewModel.enableAddButton.collectWhenUIVisible(viewLifecycleOwner) { needShow ->
+            val newTaskMenu = binding.toolbar.menu.findItem(R.id.add_task)
+            newTaskMenu.isEnabled = needShow
         }
     }
 

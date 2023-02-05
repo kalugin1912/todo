@@ -3,6 +3,7 @@
 
     <string name="tasks_screen_title">Tasks</string>
     <string name="new_task_screen_title">New Task</string>
+    <string name="new_task_screen_add">Add</string>
 
     <string-array name="priorities">
         <item>High Priority</item>
